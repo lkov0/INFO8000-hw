@@ -3,7 +3,6 @@
 from flask import Flask, escape, request, jsonify
 from flask_api import status
 import sqlite3
-import pandas as pd
 
 app = Flask(__name__)
 key = '2f279b10631d72ec3c9e82f3e59c6d83'

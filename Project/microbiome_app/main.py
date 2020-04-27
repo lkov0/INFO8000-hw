@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template
 import pandas as pd
 import numpy as np
-import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
@@ -20,23 +19,27 @@ sns.set()
 app = Flask("microbiome_app",template_folder='templates')
 clf = None
 df = None
-
-#userful function that gets the current figure as a base 64 image for embedding into websites
-def getCurrFigAsBase64HTML():
-    im_buf_arr = BytesIO()
-    plt.gcf().savefig(im_buf_arr,format='png')
-    im_buf_arr.seek(0)
-    b64data = base64.b64encode(im_buf_arr.read()).decode('utf8');
-    return render_template('img.html',img_data=b64data) 
     
 def train_rf(endo):
     global df, clf_rf
     X = df.drop(columns=[endo])
     y = np.array(df[endo])
+    feature_list = list(X.columns)
     train_features, test_features, train_labels, test_labels = train_test_split(X, y, test_size = 0.25, random_state = 18)
     clf_rf = RandomForestClassifier(n_estimators=10000, random_state=18, max_features = 'sqrt',n_jobs=-1, verbose = 1)
     clf_rf.fit(X,y)
     y_pred = clf_rf.predict(test_features)
+    
+    # make figure of top 10 features, importances
+    feature_imp = pd.Series(clf_rf.feature_importances_,index=feature_list).sort_values(ascending=False)
+    sns.barplot(x=feature_imp[:10], y=feature_imp.index[:10])
+    # Add labels to your graph
+    plt.xlabel('Feature Importance Score')
+    plt.ylabel('Features')
+    plt.title("Visualizing Important Features - Random Forest")
+    plt.legend()
+    plt.savefig("templates/img.png",format='png')
+        
     return metrics.accuracy_score(test_labels,y_pred)
 
 def train_dt(endo):
@@ -131,8 +134,8 @@ def run_classification():
         nn_accu = str(train_nn(endo))
         
         output = endo + " ACCURACIES<br><br>Random forest: " + rf_accu + "<br>Decision Tree: " + dt_accu + "<br>Ada Boost classifier: " + abc_accu + "<br>Support vector machine: " + svm_accu + "<br>Naive Bayes: " + nb_accu + "<br>Neural network: " + nn_accu
-        
-        return output
+
+        return render_template("result.html", plt_rf = "img.png")
         
     return "not implemented"
 if __name__ == "__main__":

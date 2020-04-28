@@ -1,3 +1,17 @@
-<html>  
-    <img src="templates/img.png" alt="Plot" width="500" height="400">
+<html>
+ <head>
+  <title>{{ endo }} Prediction Summary</title>
+ </head>
+ <body>
+  <h3>{{ endo }} Prediction Summary</h3>
+  Random forest: {{ rf_accu }}<br>
+  Decision Tree: {{ dt_accu }}<br>
+  Ada Boost classifier: {{ abc_accu }}<br>
+  Support vector machine: {{ svm_accu }}<br>
+  Naive Bayes: {{ nb_accu }}<br>
+  Neural network: {{ nn_accu }}<br>
+  
+  <h3>Top 10 features for random forest model</h3>
+  <img src="/static/img.png" alt="Plot" width="750" height="450">
+ </body>
 </html>

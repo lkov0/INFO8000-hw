@@ -16,7 +16,7 @@ from sklearn import metrics
 from io import BytesIO
 import base64
 sns.set()
-app = Flask("microbiome_app",template_folder='templates')
+app = Flask("microbiome_app",template_folder='templates', static_url_path='/static')
 clf = None
 df = None
     
@@ -37,8 +37,7 @@ def train_rf(endo):
     plt.xlabel('Feature Importance Score')
     plt.ylabel('Features')
     plt.title("Visualizing Important Features - Random Forest")
-    plt.legend()
-    plt.savefig("templates/img.png",format='png')
+    plt.savefig("static/img.png",format='png', bbox_inches='tight')
         
     return metrics.accuracy_score(test_labels,y_pred)
 
@@ -133,9 +132,9 @@ def run_classification():
         nb_accu = str(train_nb(endo))
         nn_accu = str(train_nn(endo))
         
-        output = endo + " ACCURACIES<br><br>Random forest: " + rf_accu + "<br>Decision Tree: " + dt_accu + "<br>Ada Boost classifier: " + abc_accu + "<br>Support vector machine: " + svm_accu + "<br>Naive Bayes: " + nb_accu + "<br>Neural network: " + nn_accu
+        #output = endo + " ACCURACIES<br><br>Random forest: " + rf_accu + "<br>Decision Tree: " + dt_accu + "<br>Ada Boost classifier: " + abc_accu + "<br>Support vector machine: " + svm_accu + "<br>Naive Bayes: " + nb_accu + "<br>Neural network: " + nn_accu
 
-        return render_template("result.html", plt_rf = "img.png")
+        return render_template("result.html", endo = endo, rf_accu = rf_accu, dt_accu = dt_accu, abc_accu = abc_accu, svm_accu = svm_accu, nb_accu = nb_accu, nn_accu = nn_accu)
         
     return "not implemented"
 if __name__ == "__main__":
